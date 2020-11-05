@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "309300305299",
+    "firebase_url": "https://calendarapp-224ce.firebaseio.com",
+    "project_id": "calendarapp-224ce",
+    "storage_bucket": "calendarapp-224ce.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:309300305299:android:3f54c40af1c940fe195c66",
+        "android_client_info": {
+          "package_name": "com.thanhhh.calendar_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "309300305299-0g13bsvh4p2pv1dcc7gb71757k9kl8kr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC71xho-m-SQ08QsfEeJo7cRk3QP1C0xwo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "309300305299-0g13bsvh4p2pv1dcc7gb71757k9kl8kr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
