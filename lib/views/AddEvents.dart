@@ -20,6 +20,7 @@ class _AddEventsState extends State<AddEvents> {
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: bottomAppBar(Colors.blue),
     );
   }
 }

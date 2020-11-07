@@ -75,28 +75,7 @@ class _HomePageState extends State<HomePage> {
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: BottomAppBar(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            IconButton(
-                icon: Icon(Icons.home),
-                color: Colors.white,
-                onPressed: () {
-                  print("Home");
-                }),
-            IconButton(
-              icon: Icon(Icons.person),
-                color: Colors.white,
-                onPressed: () {
-                  print("Acc");
-                }
-            ),
-          ],
-        ),
-        shape: CircularNotchedRectangle(),
-        color: Colors.blue,
-      ),
+      bottomNavigationBar: bottomAppBar(Colors.blue)
     );
   }
 }

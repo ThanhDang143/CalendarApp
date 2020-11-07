@@ -27,6 +27,28 @@ Widget containerDecor(DateTime date, Color boxColor, double borderRadius, Color 
   );
 }
 
-Widget aaa() {
-  return Scaffold();
+Widget bottomAppBar(Color color) {
+  return BottomAppBar(
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        IconButton(
+          icon: Icon(Icons.home),
+          color: Colors.white,
+          onPressed: () {
+            print("Home");
+          }
+        ),
+        IconButton(
+          icon: Icon(Icons.person),
+          color: Colors.white,
+            onPressed: () {
+              print("Acc");
+            }
+            ),
+          ],
+        ),
+        shape: CircularNotchedRectangle(),
+        color: color,
+  );
 }
