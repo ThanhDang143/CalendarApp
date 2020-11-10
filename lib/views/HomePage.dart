@@ -10,36 +10,46 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   CalendarController _calendarController;
+  Map<DateTime, List<dynamic>> _events;
 
   @override
   void initState() {
     super.initState();
     _calendarController = CalendarController();
+    _events = {};
+  }
+
+  Map<String, dynamic> encodeMap(Map<DateTime, dynamic> map) {
+    Map<String, dynamic> newMap = {};
+    map.forEach((key, value) {
+      newMap[key.toString()] = map[key];
+    });
+    return newMap;
+  }
+
+  Map<String, dynamic> decodeMap(Map<DateTime, dynamic> map) {
+    Map<String, dynamic> newMap = {};
+    map.forEach((key, value) {
+      newMap[key.toString()] = map[key];
+    });
+    return newMap;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: drawer(context, "Đặng Văn Thanh", "vanthanh1998@gmail.com"),
       appBar: appBar("Thanhhh's Calendar"),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TableCalendar(
+              events: _events,
               weekendDays: [DateTime.sunday],
               startingDayOfWeek: StartingDayOfWeek.monday,
               initialCalendarFormat: CalendarFormat.month,
               calendarStyle: CalendarStyle(
-                //todayColor: Colors.blueAccent,
-                //selectedColor: Theme.of(context).primaryColor.withOpacity(0.5),
-                // todayStyle: TextStyle(
-                //     fontSize: 20,
-                //     fontWeight: FontWeight.bold,
-                //     color: Colors.white),
-                // selectedStyle: TextStyle(
-                //     fontSize: 20,
-                //     fontWeight: FontWeight.bold,
-                //     color: Colors.white),
                 outsideStyle: TextStyle(
                   color: Colors.black.withOpacity(0.2),
                   fontSize: 12,
@@ -62,6 +72,23 @@ class _HomePageState extends State<HomePage> {
               ),
               calendarController: _calendarController,
             ),
+            Card(
+              color: Colors.black,
+              child: InkWell(
+                splashColor: Colors.blue.withAlpha(30),
+                onTap: () {
+                  print('Card tapped.');
+                },
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 1000,
+                  child: Text(
+                    '   A card that can be tapped',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -74,8 +101,6 @@ class _HomePageState extends State<HomePage> {
           );
         },
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: bottomAppBar(Colors.blue)
     );
   }
 }
