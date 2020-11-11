@@ -8,6 +8,7 @@ class AddEvents extends StatefulWidget {
 
 class _AddEventsState extends State<AddEvents> {
   bool isSwitched = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,12 +47,13 @@ class _AddEventsState extends State<AddEvents> {
                       ),
                     ),
                     Container(
-                      width: MediaQuery.of(context).size.width * 7/10,
+                      width: MediaQuery.of(context).size.width * 7 / 10,
                       child: Text("Alarm on!\n2020-11-13 12:00"),
                     ),
                     Container(
-                      width: MediaQuery.of(context).size.width - (MediaQuery.of(context).size.width * 8.2/10),
-                      alignment: Alignment.centerRight, 
+                      width: MediaQuery.of(context).size.width -
+                          (MediaQuery.of(context).size.width * 8.2 / 10),
+                      alignment: Alignment.centerRight,
                       child: Switch(
                         value: isSwitched,
                         onChanged: (value) {

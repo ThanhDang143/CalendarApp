@@ -55,3 +55,31 @@ Widget drawer(BuildContext context, String usn, String email) {
     ),
   );
 }
+
+Widget card(BuildContext context, String previewEvents) {
+  return Card(
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(5),
+      side: BorderSide(color: Colors.grey),
+    ),
+    child: Container(
+      height: 50,
+      child: Row(
+        children: [
+          Container(
+            width: MediaQuery.of(context).size.width / 10,
+            alignment: Alignment.center,
+            child: Icon(
+              Icons.notifications_none,
+              size: 25,
+            ),
+          ),
+          Container(
+            width: MediaQuery.of(context).size.width * 7 / 10,
+            child: Text(previewEvents),
+          ),
+        ],
+      ),
+    ),
+  );
+}
