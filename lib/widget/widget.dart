@@ -1,3 +1,4 @@
+import 'package:calendar_app/views/AddEvents.dart';
 import 'package:flutter/material.dart';
 
 Widget appBar(String title) {
@@ -30,10 +31,12 @@ Widget feature(BuildContext context, String featureName) {
   return ListTile(
     title: Text(featureName),
     onTap: () {
-      // Update the state of the app
-      // ...
-      // Then close the drawer
       Navigator.pop(context);
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => screenx),
+      // );
+      //Navigator.pop(context);
     },
   );
 }
@@ -50,7 +53,7 @@ Widget drawer(BuildContext context, String usn, String email) {
           ),
         ),
         feature(context, "Feature 1"),
-        feature(context, "Feature 2"),
+        //feature(context, "Feature 2",),
       ],
     ),
   );
