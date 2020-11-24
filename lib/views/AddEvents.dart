@@ -1,32 +1,51 @@
 import 'package:calendar_app/widget/widget.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddEvents extends StatefulWidget {
-  final String text;
-  AddEvents({Key key, @required this.text}) : super(key: key);
+  final DateTime detailDate;
+  AddEvents({Key key, @required this.detailDate}) : super(key: key);
 
   @override
-  _AddEventsState createState() => _AddEventsState(text);
+  _AddEventsState createState() => _AddEventsState(detailDate);
 }
 
 class _AddEventsState extends State<AddEvents> {
-  bool isSwitched = false;
+  DateTime detailDate;
+  _AddEventsState(this.detailDate);
 
-  DateTime selectedDate = DateTime.now();
+  bool isSwitched = false;
+  String alarm = "Alarm Off!!!";
+
+  TextEditingController _eventsTitleController;
+  TextEditingController _eventsDesController;
+
   TimeOfDay selectedTime = TimeOfDay.now();
+
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  FocusNode _nodeTitle = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _eventsTitleController = TextEditingController();
+    _eventsDesController = TextEditingController();
+  }
 
   _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
       context: context,
-      initialDate: selectedDate,
+      initialDate: detailDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2025),
     );
 
-    if (picked != null && picked != selectedDate)
+    if (picked != null && picked != detailDate) {
       setState(() {
-        selectedDate = picked;
+        detailDate = picked;
       });
+    }
   }
 
   _selectTime(BuildContext context) async {
@@ -41,24 +60,26 @@ class _AddEventsState extends State<AddEvents> {
       });
   }
 
-  final String text;
-  _AddEventsState(this.text);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: appBar("Add Events"),
-      body: Container(
+      body: SingleChildScrollView(
         child: Column(
           children: [
             Card(
               child: TextField(
+                autofocus: true,
+                focusNode: _nodeTitle,
+                controller: _eventsTitleController,
                 decoration: InputDecoration(
                     hintText: "Events", border: OutlineInputBorder()),
               ),
             ),
             Card(
               child: TextField(
+                controller: _eventsDesController,
                 maxLines: 5,
                 decoration: InputDecoration(
                     hintText: 'Description', border: OutlineInputBorder()),
@@ -71,8 +92,38 @@ class _AddEventsState extends State<AddEvents> {
                 ),
                 child: InkWell(
                   onTap: () {
-                    _selectTime(context);
                     _selectDate(context);
+                  },
+                  child: Container(
+                    height: 50,
+                    child: Row(
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width / 10,
+                          alignment: Alignment.center,
+                          child: Icon(
+                            Icons.calendar_today,
+                            size: 25,
+                          ),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 7 / 10,
+                          child: Text(
+                            "${detailDate.toString()} \n${detailDate.day.toString().padLeft(2, '0')}/${detailDate.month.toString().padLeft(2, '0')}/${detailDate.year}",
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )),
+            Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                  side: BorderSide(color: Colors.grey),
+                ),
+                child: InkWell(
+                  onTap: () {
+                    _selectTime(context);
                   },
                   child: Container(
                     height: 50,
@@ -89,7 +140,7 @@ class _AddEventsState extends State<AddEvents> {
                         Container(
                           width: MediaQuery.of(context).size.width * 7 / 10,
                           child: Text(
-                            "Alarm on!!! \n${selectedTime.hour}:${selectedTime.minute} - ${selectedDate.day}/${selectedDate.month}/${selectedDate.year}",
+                            "$alarm \n${selectedTime.hour.toString().padLeft(2, '0')}:${selectedTime.minute.toString().padLeft(2, '0')}",
                           ),
                         ),
                         Container(
@@ -101,7 +152,11 @@ class _AddEventsState extends State<AddEvents> {
                             onChanged: (value) {
                               setState(() {
                                 isSwitched = value;
-                                print(isSwitched);
+                                if (isSwitched) {
+                                  alarm = "Alarm On";
+                                } else {
+                                  alarm = "Alarm Off";
+                                }
                               });
                             },
                           ),
@@ -116,7 +171,35 @@ class _AddEventsState extends State<AddEvents> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.save),
         onPressed: () {
-          print("Save");
+          if (_eventsTitleController.text.isEmpty) {
+            _scaffoldKey.currentState
+              ..removeCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text("Event Title Can't Empty!!!"),
+                  duration: Duration(seconds: 2),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            FocusScope.of(context).requestFocus(_nodeTitle);
+          } else {
+            Navigator.pop(context, "Saved!");
+
+            DocumentReference setData =
+                FirebaseFirestore.instance.collection('Events').doc();
+
+            return setData
+                .set({
+                  'Events': _eventsTitleController.text,
+                  'Description': _eventsDesController.text,
+                  'ID': setData.id,
+                  'Date': DateTime(detailDate.year, detailDate.month,
+                      detailDate.day, selectedTime.hour, selectedTime.minute),
+                  'Alarm': isSwitched,
+                })
+                .then((value) => print("Add ok!!!"))
+                .catchError((error) => print("Failed to add user: $error"));
+          }
         },
       ),
     );

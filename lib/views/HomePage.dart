@@ -2,7 +2,6 @@
 import 'package:calendar_app/views/AddEvents.dart';
 import 'package:calendar_app/widget/widget.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class HomePage extends StatefulWidget {
@@ -15,7 +14,23 @@ class _HomePageState extends State<HomePage> {
   Map<DateTime, List<dynamic>> _events;
   TextEditingController _eventsController;
   List<dynamic> _listEvents;
-  SharedPreferences prefs;
+  DateTime detailDate;
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  _navigateAndDisplaySelection(BuildContext context, Widget screen) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => screen),
+    );
+
+    // After the Selection Screen returns a result, hide any previous snackbars
+    // and show the new result.
+    _scaffoldKey.currentState
+      ..removeCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(content: Text("$result"),duration: Duration(seconds: 2), behavior: SnackBarBehavior.floating,)
+      );
+  }
 
   @override
   void initState() {
@@ -45,6 +60,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: _scaffoldKey,
         drawer: drawer(context, "Đặng Văn Thanh", "vanthanh1998@gmail.com"),
         appBar: appBar("Thanhhh's Calendar"),
         body: Column(
@@ -94,11 +110,11 @@ class _HomePageState extends State<HomePage> {
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
           onPressed: () {
-            Navigator.push(
+            detailDate = _calendarController.selectedDay;
+            _navigateAndDisplaySelection(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => AddEvents(
-                      text: _calendarController.selectedDay.toString()),
+                AddEvents(
+                  detailDate: detailDate,
                 ));
           },
         )

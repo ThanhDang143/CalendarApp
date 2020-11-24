@@ -1,4 +1,3 @@
-import 'package:calendar_app/views/AddEvents.dart';
 import 'package:flutter/material.dart';
 
 Widget appBar(String title) {
@@ -85,4 +84,13 @@ Widget card(BuildContext context, String previewEvents) {
       ),
     ),
   );
+}
+
+class CreateEventsData {
+  DateTime createEventsDate = DateTime.now();
+  TimeOfDay createEventsTime = TimeOfDay.now();
+  String eventsTitle;
+  String eventsDes;
+
+  CreateEventsData(this.createEventsDate, this.createEventsTime, this.eventsTitle, this.eventsDes);
 }
