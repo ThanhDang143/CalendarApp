@@ -109,7 +109,7 @@ class _AddEventsState extends State<AddEvents> {
                         Container(
                           width: MediaQuery.of(context).size.width * 7 / 10,
                           child: Text(
-                            "${detailDate.toString()} \n${detailDate.day.toString().padLeft(2, '0')}/${detailDate.month.toString().padLeft(2, '0')}/${detailDate.year}",
+                            "Select Date \n${detailDate.day.toString().padLeft(2, '0')}/${detailDate.month.toString().padLeft(2, '0')}/${detailDate.year}",
                           ),
                         ),
                       ],
@@ -183,6 +183,7 @@ class _AddEventsState extends State<AddEvents> {
               );
             FocusScope.of(context).requestFocus(_nodeTitle);
           } else {
+            
             Navigator.pop(context, "Saved!");
 
             DocumentReference setData =
