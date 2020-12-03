@@ -160,12 +160,15 @@ syncNoti() {
 
       return ListView(
         children: snapshot.data.docs.map((DocumentSnapshot document) {
-          setAlarm(
-            document.data()['AlarmID'],
-            document.data()['Events'],
-            document.data()['Description'],
-            document.data()['Date'].toDate(),
-          );
+          if (document.data()['Alarm'] &&
+              !document.data()['Date'].toDate().isBefore(DateTime.now())) {
+            setAlarm(
+              document.data()['AlarmID'],
+              document.data()['Events'],
+              document.data()['Description'],
+              document.data()['Date'].toDate(),
+            );
+          }
           return Container();
         }).toList(),
       );
