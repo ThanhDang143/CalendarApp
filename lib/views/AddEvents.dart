@@ -201,7 +201,7 @@ class _AddEventsState extends State<AddEvents> {
 
             int alarmId = alarmID();
 
-            if (isSwitched) {
+            if (isSwitched && !eventsTime.isBefore(DateTime.now())) {
               return setData
                   .set({
                     'AlarmID': alarmId,

@@ -60,7 +60,6 @@ class _AllEventsState extends State<AllEvents> {
 
   showEvents() {
     String alarmStatus;
-    ScrollController _listController;
 
     CollectionReference getData =
         FirebaseFirestore.instance.collection('Events');
@@ -85,7 +84,6 @@ class _AllEventsState extends State<AllEvents> {
         }
 
         return ListView(
-          controller: _listController,
           children: snapshot.data.docs.map((DocumentSnapshot document) {
             if (document.data()['Alarm']) {
               alarmStatus = "Alarm On";

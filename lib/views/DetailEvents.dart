@@ -208,7 +208,7 @@ class _DetailEventsState extends State<DetailEvents> {
             DateTime eventsTime = DateTime(detailDate.year, detailDate.month,
                 detailDate.day, selectedTime.hour, selectedTime.minute);
 
-            if (isSwitched) {
+            if (isSwitched && !eventsTime.isBefore(DateTime.now())) {
               return update.doc(eventsInfo.iD)
                 ..update({'Events': _eventsTitleController.text})
                 ..update({'Description': _eventsDesController.text})

@@ -37,7 +37,7 @@ Widget feature(BuildContext context, Widget otherScreen, String featureName) {
     title: Text(featureName),
     onTap: () {
       Navigator.pop(context);
-      
+
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => otherScreen),
@@ -110,6 +110,8 @@ int alarmID() {
 }
 
 setAlarm(int id, String title, des, DateTime eventsTime) async {
+  print('Set Alarm $id');
+
   AndroidNotificationDetails androidPlatformChannelSpecifics =
       AndroidNotificationDetails(
     'channelId',
@@ -119,8 +121,10 @@ setAlarm(int id, String title, des, DateTime eventsTime) async {
     priority: Priority.high,
     showWhen: false,
   );
+
   NotificationDetails notificationDetails =
       NotificationDetails(android: androidPlatformChannelSpecifics);
+
   await flutterLocalNotificationsPlugin.schedule(
     id,
     title,
@@ -132,4 +136,39 @@ setAlarm(int id, String title, des, DateTime eventsTime) async {
 
 deleteAlarm(int id) async {
   await flutterLocalNotificationsPlugin.cancel(id);
+}
+
+syncNoti() {
+  CollectionReference getData = FirebaseFirestore.instance.collection('Events');
+
+  return StreamBuilder<QuerySnapshot>(
+    stream: getData
+        .where(
+          'Date',
+          isGreaterThanOrEqualTo: DateTime.now(),
+        )
+        .orderBy('Date')
+        .snapshots(),
+    builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+      if (snapshot.hasError) {
+        return Text('Something went wrong :(((');
+      }
+
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return Text("Loading...");
+      }
+
+      return ListView(
+        children: snapshot.data.docs.map((DocumentSnapshot document) {
+          setAlarm(
+            document.data()['AlarmID'],
+            document.data()['Events'],
+            document.data()['Description'],
+            document.data()['Date'].toDate(),
+          );
+          return Container();
+        }).toList(),
+      );
+    },
+  );
 }

@@ -92,7 +92,13 @@ class _HomePageState extends State<HomePage> {
           // Show Events
           Expanded(
             child: checkEvents(),
-          )
+          ),
+          // Sync Notification
+          Container(
+            width: 0,
+            height: 0,
+            child: syncNoti(),
+          ),
         ],
       ),
       // Show add button
