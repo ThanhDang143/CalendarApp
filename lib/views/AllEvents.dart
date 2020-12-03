@@ -1,9 +1,8 @@
+import 'package:calendar_app/views/AddEvents.dart';
+import 'package:calendar_app/views/DetailEvents.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:calendar_app/widget/widget.dart';
-import 'package:table_calendar/table_calendar.dart';
-
-import 'AddEvents.dart';
+import 'package:calendar_app/misc/misc.dart';
 
 class AllEvents extends StatefulWidget {
   @override
@@ -12,14 +11,6 @@ class AllEvents extends StatefulWidget {
 
 class _AllEventsState extends State<AllEvents> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
-  DateTime detailDate;
-  CalendarController _calendarController;
-
-  @override
-  void initState() {
-    super.initState();
-    _calendarController = CalendarController();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +30,7 @@ class _AllEventsState extends State<AllEvents> {
         onPressed: () {
           _navigateAndDisplaySelection(
             context,
-            AddEvents(
-              detailDate: DateTime.now(),
-            ),
+            AddEvents(detailDate: DateTime.now()),
           );
         },
       ),
@@ -71,6 +60,7 @@ class _AllEventsState extends State<AllEvents> {
 
   showEvents() {
     String alarmStatus;
+    ScrollController _listController;
 
     CollectionReference getData =
         FirebaseFirestore.instance.collection('Events');
@@ -84,7 +74,7 @@ class _AllEventsState extends State<AllEvents> {
     }
 
     return StreamBuilder<QuerySnapshot>(
-      stream: getData.snapshots(),
+      stream: getData.orderBy('Date').snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return Text('Something went wrong :(((');
@@ -95,12 +85,24 @@ class _AllEventsState extends State<AllEvents> {
         }
 
         return ListView(
+          controller: _listController,
           children: snapshot.data.docs.map((DocumentSnapshot document) {
             if (document.data()['Alarm']) {
               alarmStatus = "Alarm On";
             } else {
               alarmStatus = "Alarm Off";
             }
+
+            // Get data for Detail Events
+            EventsInfo eventsInfo = EventsInfo(
+              document.data()['ID'],
+              document.data()['Date'].toDate(),
+              document.data()['Alarm'],
+              document.data()['Events'],
+              document.data()['Description'],
+              document.data()['AlarmID'],
+            );
+
             return Dismissible(
               background: Card(
                 color: Colors.red,
@@ -117,7 +119,10 @@ class _AllEventsState extends State<AllEvents> {
                   ),
                   child: InkWell(
                     onTap: () {
-                      print("${_calendarController.selectedDay}");
+                      _navigateAndDisplaySelection(
+                        context,
+                        DetailEvents(eventsInfo: eventsInfo),
+                      );
                     },
                     child: Container(
                       padding: EdgeInsets.only(
@@ -154,6 +159,7 @@ class _AllEventsState extends State<AllEvents> {
                     ),
                   )),
               onDismissed: (direction) {
+                deleteAlarm(document.data()['AlarmID']);
                 deleteData(document.data()['ID']);
               },
             );

@@ -1,4 +1,10 @@
+import 'package:calendar_app/views/AllEvents.dart';
+import 'package:calendar_app/views/HomePage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+import '../main.dart';
 
 Widget appBar(String title) {
   return AppBar(
@@ -26,16 +32,16 @@ Widget containerDecor(
       ));
 }
 
-Widget feature(BuildContext context, String featureName) {
+Widget feature(BuildContext context, Widget otherScreen, String featureName) {
   return ListTile(
     title: Text(featureName),
     onTap: () {
       Navigator.pop(context);
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(builder: (context) => screenx),
-      // );
-      //Navigator.pop(context);
+      
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => otherScreen),
+      );
     },
   );
 }
@@ -51,8 +57,8 @@ Widget drawer(BuildContext context, String usn, String email) {
             backgroundColor: Colors.white,
           ),
         ),
-        feature(context, "Feature 1"),
-        //feature(context, "Feature 2",),
+        feature(context, HomePage(), 'Home'),
+        feature(context, AllEvents(), 'All Events'),
       ],
     ),
   );
@@ -86,11 +92,44 @@ Widget card(BuildContext context, String previewEvents) {
   );
 }
 
-class CreateEventsData {
-  DateTime createEventsDate = DateTime.now();
-  TimeOfDay createEventsTime = TimeOfDay.now();
+class EventsInfo {
+  String iD;
+  DateTime eventsDate = DateTime.now();
+  bool alarm;
   String eventsTitle;
   String eventsDes;
+  int alarmID;
 
-  CreateEventsData(this.createEventsDate, this.createEventsTime, this.eventsTitle, this.eventsDes);
+  EventsInfo(this.iD, this.eventsDate, this.alarm, this.eventsTitle,
+      this.eventsDes, this.alarmID);
+}
+
+int alarmID() {
+  int x = Timestamp.now().seconds - Timestamp.now().nanoseconds;
+  return x;
+}
+
+setAlarm(int id, String title, des, DateTime eventsTime) async {
+  AndroidNotificationDetails androidPlatformChannelSpecifics =
+      AndroidNotificationDetails(
+    'channelId',
+    'channelName',
+    'channelDescription',
+    importance: Importance.max,
+    priority: Priority.high,
+    showWhen: false,
+  );
+  NotificationDetails notificationDetails =
+      NotificationDetails(android: androidPlatformChannelSpecifics);
+  await flutterLocalNotificationsPlugin.schedule(
+    id,
+    title,
+    des,
+    eventsTime,
+    notificationDetails,
+  );
+}
+
+deleteAlarm(int id) async {
+  await flutterLocalNotificationsPlugin.cancel(id);
 }

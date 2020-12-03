@@ -1,6 +1,6 @@
-//import 'package:calendar_app/views/AddEvents.dart';
 import 'package:calendar_app/views/AddEvents.dart';
-import 'package:calendar_app/widget/widget.dart';
+import 'package:calendar_app/views/DetailEvents.dart';
+import 'package:calendar_app/misc/misc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -16,6 +16,7 @@ class _HomePageState extends State<HomePage> {
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  //  Function navigate display
   _navigateAndDisplaySelection(BuildContext context, Widget screen) async {
     final result = await Navigator.push(
       context,
@@ -53,6 +54,7 @@ class _HomePageState extends State<HomePage> {
       appBar: appBar("Thanhhh's Calendar"),
       body: Column(
         children: [
+          // Show Calendar
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -87,11 +89,13 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
+          // Show Events
           Expanded(
             child: checkEvents(),
           )
         ],
       ),
+      // Show add button
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () {
@@ -107,6 +111,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // Function check error for showEvents
   checkEvents() {
     if (_calendarController.selectedDay == null) {
       return showEvents(
@@ -123,12 +128,14 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  // Function show Events
   showEvents(int year, month, day) {
     String alarmStatus;
 
     CollectionReference getData =
         FirebaseFirestore.instance.collection('Events');
 
+    // Function delete events
     deleteData(String id) {
       return getData
           .doc(id)
@@ -144,6 +151,7 @@ class _HomePageState extends State<HomePage> {
             isGreaterThanOrEqualTo: DateTime(year, month, day, 00, 00, 00),
             isLessThanOrEqualTo: DateTime(year, month, day, 23, 59, 59),
           )
+          .orderBy('Date')
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
@@ -161,6 +169,17 @@ class _HomePageState extends State<HomePage> {
             } else {
               alarmStatus = "Alarm Off";
             }
+
+            // Get data for Detail Events
+            EventsInfo eventsInfo = EventsInfo(
+              document.data()['ID'],
+              document.data()['Date'].toDate(),
+              document.data()['Alarm'],
+              document.data()['Events'],
+              document.data()['Description'],
+              document.data()['AlarmID'],
+            );
+
             return Dismissible(
               background: Card(
                 color: Colors.red,
@@ -177,7 +196,11 @@ class _HomePageState extends State<HomePage> {
                   ),
                   child: InkWell(
                     onTap: () {
-                      print("${_calendarController.selectedDay}");
+                      _navigateAndDisplaySelection(
+                          context,
+                          DetailEvents(
+                            eventsInfo: eventsInfo,
+                          ));
                     },
                     child: Container(
                       padding: EdgeInsets.only(
@@ -214,6 +237,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   )),
               onDismissed: (direction) {
+                deleteAlarm(document.data()['AlarmID']);
                 deleteData(document.data()['ID']);
               },
             );

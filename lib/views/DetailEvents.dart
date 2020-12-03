@@ -1,27 +1,27 @@
-import 'package:calendar_app/widget/widget.dart';
+import 'package:calendar_app/misc/misc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class DetailEvents extends StatefulWidget {
-  final String iD;
-  DetailEvents({Key key, @required this.iD}) : super(key: key);
+  final EventsInfo eventsInfo;
+  DetailEvents({Key key, @required this.eventsInfo}) : super(key: key);
 
   @override
-  _DetailEventsState createState() => _DetailEventsState(iD);
+  _DetailEventsState createState() => _DetailEventsState(eventsInfo);
 }
 
 class _DetailEventsState extends State<DetailEvents> {
-  String iD;
-  _DetailEventsState(this.iD);
+  EventsInfo eventsInfo;
+  _DetailEventsState(this.eventsInfo);
 
   DateTime detailDate;
   bool isSwitched = false;
-  String alarm = "Alarm Off!!!";
+  String alarm;
 
   TextEditingController _eventsTitleController;
   TextEditingController _eventsDesController;
 
-  TimeOfDay selectedTime = TimeOfDay.now();
+  TimeOfDay selectedTime;
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -30,8 +30,20 @@ class _DetailEventsState extends State<DetailEvents> {
   @override
   void initState() {
     super.initState();
-    _eventsTitleController = TextEditingController();
-    _eventsDesController = TextEditingController();
+    _eventsTitleController =
+        TextEditingController(text: eventsInfo.eventsTitle);
+    _eventsDesController = TextEditingController(text: eventsInfo.eventsDes);
+    detailDate = eventsInfo.eventsDate;
+    selectedTime = TimeOfDay(
+      hour: eventsInfo.eventsDate.hour,
+      minute: eventsInfo.eventsDate.minute,
+    );
+    isSwitched = eventsInfo.alarm;
+    if (isSwitched) {
+      alarm = "Alarm On";
+    } else {
+      alarm = "Alarm Off";
+    }
   }
 
   _selectDate(BuildContext context) async {
@@ -61,114 +73,118 @@ class _DetailEventsState extends State<DetailEvents> {
       });
   }
 
+  Widget view() {
+    return Column(
+      children: [
+        Card(
+          child: TextField(
+            textCapitalization: TextCapitalization.sentences,
+            autofocus: true,
+            focusNode: _nodeTitle,
+            controller: _eventsTitleController,
+            decoration: InputDecoration(
+                hintText: "Events", border: OutlineInputBorder()),
+          ),
+        ),
+        Card(
+          child: TextField(
+            textCapitalization: TextCapitalization.sentences,
+            controller: _eventsDesController,
+            maxLines: 5,
+            decoration: InputDecoration(
+                hintText: 'Description', border: OutlineInputBorder()),
+          ),
+        ),
+        Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
+              side: BorderSide(color: Colors.grey),
+            ),
+            child: InkWell(
+              onTap: () {
+                _selectDate(context);
+              },
+              child: Container(
+                height: 50,
+                child: Row(
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width / 10,
+                      alignment: Alignment.center,
+                      child: Icon(
+                        Icons.calendar_today,
+                        size: 25,
+                      ),
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width * 7 / 10,
+                      child: Text(
+                        "Select Date \n${detailDate.day.toString().padLeft(2, '0')}/${detailDate.month.toString().padLeft(2, '0')}/${detailDate.year}",
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )),
+        Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
+              side: BorderSide(color: Colors.grey),
+            ),
+            child: InkWell(
+              onTap: () {
+                _selectTime(context);
+              },
+              child: Container(
+                height: 50,
+                child: Row(
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width / 10,
+                      alignment: Alignment.center,
+                      child: Icon(
+                        Icons.notifications_none,
+                        size: 25,
+                      ),
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width * 7 / 10,
+                      child: Text(
+                        "$alarm \n${selectedTime.hour.toString().padLeft(2, '0')}:${selectedTime.minute.toString().padLeft(2, '0')}",
+                      ),
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width -
+                          (MediaQuery.of(context).size.width * 8.2 / 10),
+                      alignment: Alignment.centerRight,
+                      child: Switch(
+                        value: isSwitched,
+                        onChanged: (value) {
+                          setState(() {
+                            isSwitched = value;
+                            if (isSwitched) {
+                              alarm = "Alarm On";
+                            } else {
+                              alarm = "Alarm Off";
+                            }
+                          });
+                        },
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ))
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: appBar("Add Events"),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Card(
-              child: TextField(
-                autofocus: true,
-                focusNode: _nodeTitle,
-                controller: _eventsTitleController,
-                decoration: InputDecoration(
-                    hintText: "Events", border: OutlineInputBorder()),
-              ),
-            ),
-            Card(
-              child: TextField(
-                controller: _eventsDesController,
-                maxLines: 5,
-                decoration: InputDecoration(
-                    hintText: 'Description', border: OutlineInputBorder()),
-              ),
-            ),
-            Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
-                  side: BorderSide(color: Colors.grey),
-                ),
-                child: InkWell(
-                  onTap: () {
-                    _selectDate(context);
-                  },
-                  child: Container(
-                    height: 50,
-                    child: Row(
-                      children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width / 10,
-                          alignment: Alignment.center,
-                          child: Icon(
-                            Icons.calendar_today,
-                            size: 25,
-                          ),
-                        ),
-                        Container(
-                          width: MediaQuery.of(context).size.width * 7 / 10,
-                          child: Text(
-                            "Select Date \n${detailDate.day.toString().padLeft(2, '0')}/${detailDate.month.toString().padLeft(2, '0')}/${detailDate.year}",
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )),
-            Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
-                  side: BorderSide(color: Colors.grey),
-                ),
-                child: InkWell(
-                  onTap: () {
-                    _selectTime(context);
-                  },
-                  child: Container(
-                    height: 50,
-                    child: Row(
-                      children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width / 10,
-                          alignment: Alignment.center,
-                          child: Icon(
-                            Icons.notifications_none,
-                            size: 25,
-                          ),
-                        ),
-                        Container(
-                          width: MediaQuery.of(context).size.width * 7 / 10,
-                          child: Text(
-                            "$alarm \n${selectedTime.hour.toString().padLeft(2, '0')}:${selectedTime.minute.toString().padLeft(2, '0')}",
-                          ),
-                        ),
-                        Container(
-                          width: MediaQuery.of(context).size.width -
-                              (MediaQuery.of(context).size.width * 8.2 / 10),
-                          alignment: Alignment.centerRight,
-                          child: Switch(
-                            value: isSwitched,
-                            onChanged: (value) {
-                              setState(() {
-                                isSwitched = value;
-                                if (isSwitched) {
-                                  alarm = "Alarm On";
-                                } else {
-                                  alarm = "Alarm Off";
-                                }
-                              });
-                            },
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ))
-          ],
-        ),
-      ),
+      appBar: appBar("Edit Events"),
+      body: view(),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.save),
         onPressed: () {
@@ -184,23 +200,38 @@ class _DetailEventsState extends State<DetailEvents> {
               );
             FocusScope.of(context).requestFocus(_nodeTitle);
           } else {
-            
-            Navigator.pop(context, "Saved!");
+            Navigator.pop(context, "Updated!");
 
-            DocumentReference setData =
-                FirebaseFirestore.instance.collection('Events').doc();
+            CollectionReference update =
+                FirebaseFirestore.instance.collection('Events');
 
-            return setData
-                .set({
-                  'Events': _eventsTitleController.text,
-                  'Description': _eventsDesController.text,
-                  'ID': setData.id,
-                  'Date': DateTime(detailDate.year, detailDate.month,
-                      detailDate.day, selectedTime.hour, selectedTime.minute),
-                  'Alarm': isSwitched,
-                })
-                .then((value) => print("Add ok!!!"))
-                .catchError((error) => print("Failed to add user: $error"));
+            DateTime eventsTime = DateTime(detailDate.year, detailDate.month,
+                detailDate.day, selectedTime.hour, selectedTime.minute);
+
+            if (isSwitched) {
+              return update.doc(eventsInfo.iD)
+                ..update({'Events': _eventsTitleController.text})
+                ..update({'Description': _eventsDesController.text})
+                ..update({'Alarm': isSwitched})
+                ..update({'Date': eventsTime})
+                    .then((value) => deleteAlarm(eventsInfo.alarmID))
+                    .then((value) => setAlarm(
+                        eventsInfo.alarmID,
+                        _eventsTitleController.text,
+                        _eventsDesController.text,
+                        eventsTime))
+                    .catchError(
+                        (error) => print("Failed to update user: $error"));
+            } else {
+              return update.doc(eventsInfo.iD)
+                ..update({'Events': _eventsTitleController.text})
+                ..update({'Description': _eventsDesController.text})
+                ..update({'Alarm': isSwitched})
+                ..update({'Date': eventsTime})
+                    .then((value) => deleteAlarm(eventsInfo.alarmID))
+                    .catchError(
+                        (error) => print("Failed to update user: $error"));
+            }
           }
         },
       ),
