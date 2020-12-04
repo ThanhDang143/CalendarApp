@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
       builder: (context, child) => MediaQuery(
           data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
           child: child),
-      title: 'Flutter Demo',
+      title: "Thanhhh's Calendar",
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
