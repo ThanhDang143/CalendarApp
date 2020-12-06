@@ -70,16 +70,15 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 headerStyle: HeaderStyle(
-                    formatButtonDecoration: BoxDecoration(
-                        color: Colors.blue,
-                        borderRadius: BorderRadius.circular(15)),
-                    formatButtonTextStyle: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white)),
-                onDaySelected: (date, events, _) {
-                  setState(() {
-                    //_listEvents = events;
-                  });
-                },
+                  formatButtonDecoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  formatButtonTextStyle: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
                 builders: CalendarBuilders(
                   selectedDayBuilder: (context, date, events) =>
                       containerDecor(date, Colors.lightBlue, 50, Colors.white),
@@ -151,14 +150,14 @@ class _HomePageState extends State<HomePage> {
     }
 
     return StreamBuilder<QuerySnapshot>(
-      stream: getData
-          .where(
-            'Date',
-            isGreaterThanOrEqualTo: DateTime(year, month, day, 00, 00, 00),
-            isLessThanOrEqualTo: DateTime(year, month, day, 23, 59, 59),
-          )
-          .orderBy('Date')
-          .snapshots(),
+stream: getData
+    .where(
+      'Date',
+      isGreaterThanOrEqualTo: DateTime(year, month, day, 00, 00, 00),
+      isLessThanOrEqualTo: DateTime(year, month, day, 23, 59, 59),
+    )
+    .orderBy('Date')
+    .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return Text('Something went wrong :(((');

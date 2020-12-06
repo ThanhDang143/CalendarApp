@@ -32,7 +32,7 @@ Widget containerDecor(
       ));
 }
 
-Widget feature(BuildContext context, Widget otherScreen, String featureName) {
+Widget navigator(BuildContext context, Widget otherScreen, String featureName) {
   return ListTile(
     title: Text(featureName),
     onTap: () {
@@ -57,8 +57,8 @@ Widget drawer(BuildContext context, String usn, String email) {
             backgroundColor: Colors.white,
           ),
         ),
-        feature(context, HomePage(), 'Home'),
-        feature(context, AllEvents(), 'All Events'),
+        navigator(context, HomePage(), 'Home'),
+        navigator(context, AllEvents(), 'All Events'),
       ],
     ),
   );
@@ -168,6 +168,8 @@ syncNoti() {
               document.data()['Description'],
               document.data()['Date'].toDate(),
             );
+          } else {
+            deleteAlarm(document.data()['AlarmID']);
           }
           return Container();
         }).toList(),
