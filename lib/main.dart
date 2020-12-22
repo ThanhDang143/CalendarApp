@@ -1,6 +1,7 @@
 // ignore: unused_import
 import 'package:calendar_app/misc/misc.dart';
-import 'package:calendar_app/views/HomePage.dart';
+import 'package:calendar_app/views/Authentic/SignIn.dart';
+import 'package:calendar_app/views/Main/HomePage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -52,7 +53,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomePage(),
+      home: SignIn(),
     );
   }
 }

@@ -1,48 +1,30 @@
-import 'package:calendar_app/views/AddEvents.dart';
-import 'package:calendar_app/views/DetailEvents.dart';
+import 'package:calendar_app/views/Main/AddEvents.dart';
+import 'package:calendar_app/views/Main/EditEvents.dart';
+import 'package:calendar_app/misc/misc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:calendar_app/misc/misc.dart';
+import 'package:table_calendar/table_calendar.dart';
 
-class AllEvents extends StatefulWidget {
+class HomePage extends StatefulWidget {
   @override
-  _AllEventsState createState() => _AllEventsState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _AllEventsState extends State<AllEvents> {
+class _HomePageState extends State<HomePage> {
+  CalendarController _calendarController;
+  DateTime detailDate;
+
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      drawer: drawer(context, "Đặng Văn Thanh", "vanthanh1998@gmail.com"),
-      appBar: appBar("Thanhhh's Calendar"),
-      body: Column(
-        children: [
-          Expanded(
-            child: showEvents(),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () {
-          _navigateAndDisplaySelection(
-            context,
-            AddEvents(detailDate: DateTime.now()),
-          );
-        },
-      ),
-    );
-  }
-
+  //  Function navigate display
   _navigateAndDisplaySelection(BuildContext context, Widget screen) async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => screen),
     );
 
+    // After the Selection Screen returns a result, hide any previous snackbars
+    // and show the new result.
     if (result == null) {
       return;
     }
@@ -58,12 +40,107 @@ class _AllEventsState extends State<AllEvents> {
       );
   }
 
-  showEvents() {
+  @override
+  void initState() {
+    super.initState();
+    _calendarController = CalendarController();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: _scaffoldKey,
+      drawer: drawer(context, "Đặng Văn Thanh", "vanthanh1998@gmail.com"),
+      appBar: appBar("Thanhhh's Calendar"),
+      body: Column(
+        children: [
+          // Show Calendar
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TableCalendar(
+                calendarController: _calendarController,
+                weekendDays: [DateTime.sunday],
+                startingDayOfWeek: StartingDayOfWeek.monday,
+                initialCalendarFormat: CalendarFormat.month,
+                calendarStyle: CalendarStyle(
+                  outsideStyle: TextStyle(
+                    color: Colors.black.withOpacity(0.2),
+                    fontSize: 12,
+                  ),
+                ),
+                headerStyle: HeaderStyle(
+                  formatButtonDecoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  formatButtonTextStyle: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                builders: CalendarBuilders(
+                  selectedDayBuilder: (context, date, events) =>
+                      containerDecor(date, Colors.lightBlue, 50, Colors.white),
+                  todayDayBuilder: (context, date, events) => containerDecor(
+                      date, Colors.blue.withOpacity(0.25), 50, Colors.white),
+                ),
+              ),
+            ],
+          ),
+          // Show Events
+          Expanded(
+            child: checkEvents(),
+          ),
+          // Sync Notification
+          Container(
+            width: 0,
+            height: 0,
+            child: syncNoti(),
+          ),
+        ],
+      ),
+      // Show add button
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () {
+          detailDate = _calendarController.selectedDay;
+          _navigateAndDisplaySelection(
+            context,
+            AddEvents(
+              detailDate: detailDate,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // Function check error for showEvents
+  checkEvents() {
+    if (_calendarController.selectedDay == null) {
+      return showEvents(
+        DateTime.now().year,
+        DateTime.now().month,
+        DateTime.now().day,
+      );
+    } else {
+      return showEvents(
+        _calendarController.selectedDay.year,
+        _calendarController.selectedDay.month,
+        _calendarController.selectedDay.day,
+      );
+    }
+  }
+
+  // Function show Events
+  showEvents(int year, month, day) {
     String alarmStatus;
 
     CollectionReference getData =
         FirebaseFirestore.instance.collection('Events');
 
+    // Function delete events
     deleteData(String id) {
       return getData
           .doc(id)
@@ -73,7 +150,14 @@ class _AllEventsState extends State<AllEvents> {
     }
 
     return StreamBuilder<QuerySnapshot>(
-      stream: getData.orderBy('Date').snapshots(),
+stream: getData
+    .where(
+      'Date',
+      isGreaterThanOrEqualTo: DateTime(year, month, day, 00, 00, 00),
+      isLessThanOrEqualTo: DateTime(year, month, day, 23, 59, 59),
+    )
+    .orderBy('Date')
+    .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return Text('Something went wrong :(((');
@@ -118,9 +202,10 @@ class _AllEventsState extends State<AllEvents> {
                   child: InkWell(
                     onTap: () {
                       _navigateAndDisplaySelection(
-                        context,
-                        DetailEvents(eventsInfo: eventsInfo),
-                      );
+                          context,
+                          DetailEvents(
+                            eventsInfo: eventsInfo,
+                          ));
                     },
                     child: Container(
                       padding: EdgeInsets.only(
