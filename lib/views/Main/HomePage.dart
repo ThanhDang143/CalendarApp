@@ -150,14 +150,14 @@ class _HomePageState extends State<HomePage> {
     }
 
     return StreamBuilder<QuerySnapshot>(
-stream: getData
-    .where(
-      'Date',
-      isGreaterThanOrEqualTo: DateTime(year, month, day, 00, 00, 00),
-      isLessThanOrEqualTo: DateTime(year, month, day, 23, 59, 59),
-    )
-    .orderBy('Date')
-    .snapshots(),
+      stream: getData
+          .where(
+            'Date',
+            isGreaterThanOrEqualTo: DateTime(year, month, day, 00, 00, 00),
+            isLessThanOrEqualTo: DateTime(year, month, day, 23, 59, 59),
+          )
+          .orderBy('Date')
+          .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return Text('Something went wrong :(((');

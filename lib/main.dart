@@ -1,6 +1,7 @@
 // ignore: unused_import
 import 'package:calendar_app/misc/misc.dart';
 import 'package:calendar_app/views/Authentic/SignIn.dart';
+import 'package:calendar_app/views/Authentic/SignUp.dart';
 import 'package:calendar_app/views/Main/HomePage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';

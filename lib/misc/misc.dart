@@ -1,6 +1,8 @@
+import 'package:calendar_app/views/Authentic/SignIn.dart';
 import 'package:calendar_app/views/Main/AllEvents.dart';
 import 'package:calendar_app/views/Main/HomePage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -59,6 +61,8 @@ Widget drawer(BuildContext context, String usn, String email) {
         ),
         navigator(context, HomePage(), 'Home'),
         navigator(context, AllEvents(), 'All Events'),
+        navigator(context, SignIn(), 'Sign In'),
+        navigator(context, HomePage(), 'Sign Out')
       ],
     ),
   );
@@ -176,4 +180,61 @@ syncNoti() {
       );
     },
   );
+}
+
+bool isValidEmail(value) {
+  return RegExp(
+          r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+      .hasMatch(value);
+}
+
+showAlertDialog(
+    BuildContext context, String title, String message, String button) {
+  Widget alertButton = FlatButton(
+    child: Text("$button"),
+    onPressed: () {},
+  );
+
+  AlertDialog alert = AlertDialog(
+    title: Text("$title"),
+    content: Text("$message"),
+    actions: [
+      alertButton,
+    ],
+  );
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return alert;
+    },
+  );
+}
+
+Future signOut() async {
+  try {
+    return await FirebaseAuth.instance.signOut();
+  } catch (e) {
+    print(e.toString());
+    return null;
+  }
+}
+
+Future signUp(BuildContext context, String email, String password) async {
+  try {
+    UserCredential userCredential = await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: email, password: password);
+    showAlertDialog(context, 'Sign Up', 'Success', 'Sign In');
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'weak-password') {
+      showAlertDialog(context, 'Sign Up', 'The password provided is too weak!',
+          'Try Again');
+    } else if (e.code == 'email-already-in-use') {
+      showAlertDialog(context, 'Sign Up',
+          'The account already exists for that email!', 'Try Again');
+    }
+  } catch (e) {
+    showAlertDialog(
+        context, 'Sign Up', 'Oh No!!! We hava an error!', 'Try Again');
+  }
 }
