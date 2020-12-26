@@ -1,7 +1,8 @@
-import 'package:calendar_app/views/AddEvents.dart';
-import 'package:calendar_app/views/DetailEvents.dart';
+import 'package:calendar_app/views/Main/AddEvents.dart';
+import 'package:calendar_app/views/Main/DetailEvents.dart';
 import 'package:calendar_app/misc/misc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -50,7 +51,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: drawer(context, "Đặng Văn Thanh", "vanthanh1998@gmail.com"),
+      drawer: drawer(context),
       appBar: appBar("Thanhhh's Calendar"),
       body: Column(
         children: [
@@ -141,6 +142,8 @@ class _HomePageState extends State<HomePage> {
     CollectionReference getData =
         FirebaseFirestore.instance.collection('Events');
 
+    User _user = FirebaseAuth.instance.currentUser;
+
     // Function delete events
     deleteData(String id) {
       return getData
@@ -152,6 +155,7 @@ class _HomePageState extends State<HomePage> {
 
     return StreamBuilder<QuerySnapshot>(
       stream: getData
+          .where('UserID', isEqualTo: _user.uid)
           .where(
             'Date',
             isGreaterThanOrEqualTo: DateTime(year, month, day, 00, 00, 00),

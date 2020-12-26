@@ -1,4 +1,5 @@
 import 'package:calendar_app/misc/misc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -201,9 +202,12 @@ class _AddEventsState extends State<AddEvents> {
 
             int alarmId = alarmID();
 
+            User _user = FirebaseAuth.instance.currentUser;
+
             if (isSwitched && !eventsTime.isBefore(DateTime.now())) {
               return setData
                   .set({
+                    'UserID': _user.uid,
                     'AlarmID': alarmId,
                     'Events': _eventsTitleController.text,
                     'Description': _eventsDesController.text,
@@ -220,6 +224,7 @@ class _AddEventsState extends State<AddEvents> {
             } else {
               return setData
                   .set({
+                    'UserID': _user.uid,
                     'AlarmID': alarmId,
                     'Events': _eventsTitleController.text,
                     'Description': _eventsDesController.text,

@@ -1,6 +1,7 @@
-import 'package:calendar_app/views/AddEvents.dart';
-import 'package:calendar_app/views/DetailEvents.dart';
+import 'package:calendar_app/views/Main/AddEvents.dart';
+import 'package:calendar_app/views/Main/DetailEvents.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar_app/misc/misc.dart';
 
@@ -16,7 +17,7 @@ class _AllEventsState extends State<AllEvents> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: drawer(context, "Đặng Văn Thanh", "vanthanh1998@gmail.com"),
+      drawer: drawer(context),
       appBar: appBar("Thanhhh's Calendar"),
       body: Column(
         children: [
@@ -64,6 +65,8 @@ class _AllEventsState extends State<AllEvents> {
     CollectionReference getData =
         FirebaseFirestore.instance.collection('Events');
 
+    User _user = FirebaseAuth.instance.currentUser;
+
     deleteData(String id) {
       return getData
           .doc(id)
@@ -73,7 +76,10 @@ class _AllEventsState extends State<AllEvents> {
     }
 
     return StreamBuilder<QuerySnapshot>(
-      stream: getData.orderBy('Date').snapshots(),
+      stream: getData
+          .where('UserID', isEqualTo: _user.uid)
+          .orderBy('Date')
+          .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return Text('Something went wrong :(((');

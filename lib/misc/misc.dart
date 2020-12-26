@@ -1,10 +1,13 @@
-import 'package:calendar_app/views/AllEvents.dart';
-import 'package:calendar_app/views/HomePage.dart';
+import 'package:calendar_app/views/Auth/SignIn.dart';
+import 'package:calendar_app/views/Main/AllEvents.dart';
+import 'package:calendar_app/views/Main/HomePage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../main.dart';
+import '../views/Main/AllEvents.dart';
 
 Widget appBar(String title) {
   return AppBar(
@@ -32,7 +35,7 @@ Widget containerDecor(
       ));
 }
 
-Widget feature(BuildContext context, Widget otherScreen, String featureName) {
+Widget navigator(BuildContext context, Widget otherScreen, String featureName) {
   return ListTile(
     title: Text(featureName),
     onTap: () {
@@ -46,19 +49,38 @@ Widget feature(BuildContext context, Widget otherScreen, String featureName) {
   );
 }
 
-Widget drawer(BuildContext context, String usn, String email) {
-  return Drawer(
+Widget signOutWidget(
+    BuildContext context, Widget otherScreen, String featureName) {
+  return ListTile(
+    title: Text(featureName),
+    onTap: () {
+      signOut();
+
+      Navigator.pop(context);
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => otherScreen),
+      );
+    },
+  );
+}
+
+Widget drawer(BuildContext context) {
+
+    return Drawer(
     child: ListView(
       children: [
         UserAccountsDrawerHeader(
-          accountName: Text(usn),
-          accountEmail: Text(email),
+        accountName: Text('${FirebaseAuth.instance.currentUser.displayName}'),
+          accountEmail: Text('${FirebaseAuth.instance.currentUser.email}'),
           currentAccountPicture: CircleAvatar(
             backgroundColor: Colors.white,
           ),
         ),
-        feature(context, HomePage(), 'Home'),
-        feature(context, AllEvents(), 'All Events'),
+        navigator(context, HomePage(), 'Home'),
+        navigator(context, AllEvents(), 'All Events'),
+        signOutWidget(context, SignIn(), 'Sign Out')
       ],
     ),
   );
@@ -174,4 +196,126 @@ syncNoti() {
       );
     },
   );
+}
+
+//Auth
+bool isValidEmail(value) {
+  return RegExp(
+          r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+      .hasMatch(value);
+}
+
+Widget alertSignInButton(BuildContext context) {
+  return FlatButton(
+    child: Text("Sign In"),
+    onPressed: () {
+      Navigator.pop(context);
+      Navigator.pop(context);
+    },
+  );
+}
+
+Widget alertTryAgainButton(BuildContext context) {
+  return FlatButton(
+    child: Text("Try Again"),
+    onPressed: () {
+      Navigator.pop(context);
+    },
+  );
+}
+
+showAlertDialog(
+    BuildContext context, String title, String message, Widget action) {
+  AlertDialog alert = AlertDialog(
+    title: Text("$title"),
+    content: Text("$message"),
+    actions: [
+      action,
+    ],
+  );
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return alert;
+    },
+  );
+}
+
+Future signOut() async {
+  try {
+    return await FirebaseAuth.instance.signOut();
+  } catch (e) {
+    print(e.toString());
+    return null;
+  }
+}
+
+Future signUp(BuildContext context, String email, String password,
+    String displayName) async {
+  try {
+    UserCredential userCredential = await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: email, password: password);
+    showAlertDialog(
+      context,
+      'Sign Up',
+      'Success',
+      alertSignInButton(context),
+    );
+    FirebaseAuth.instance.currentUser.updateProfile(displayName: displayName);
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'weak-password') {
+      showAlertDialog(
+        context,
+        'Sign Up',
+        'The password provided is too weak!',
+        alertTryAgainButton(context),
+      );
+    } else if (e.code == 'email-already-in-use') {
+      showAlertDialog(
+        context,
+        'Sign Up',
+        'The account already exists for that email!',
+        alertTryAgainButton(context),
+      );
+    }
+  } catch (e) {
+    showAlertDialog(
+      context,
+      'Sign Up',
+      'Oh No!!! We hava an error!',
+      alertTryAgainButton(context),
+    );
+  }
+}
+
+Future signIn(BuildContext context, String email, String password) async {
+  try {
+    UserCredential userCredential =
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => HomePage()),
+    );
+  } catch (e) {
+    showAlertDialog(
+      context,
+      'Sign In',
+      'Oh No!!! Check your email or password!',
+      alertTryAgainButton(context),
+    );
+  }
+}
+
+Widget checkLogin() {
+  User _user = FirebaseAuth.instance.currentUser;
+
+  //Check login
+  if (_user != null) {
+    return HomePage();
+  }
+  return SignIn();
 }
