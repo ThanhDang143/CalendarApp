@@ -100,6 +100,7 @@ packages:
     source: hosted
     version: "0.18.4+1"
   firebase_auth_platform_interface:
+<<<<<<< HEAD
     dependency: transitive
     description:
       name: firebase_auth_platform_interface
@@ -114,7 +115,23 @@ packages:
     source: hosted
     version: "0.3.2+3"
   firebase_core:
+=======
+>>>>>>> ba525dd8da3f1238422379c7ed97fe382636f373
     dependency: transitive
+    description:
+      name: firebase_auth_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.4"
+  firebase_auth_web:
+    dependency: transitive
+    description:
+      name: firebase_auth_web
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.2+3"
+  firebase_core:
+    dependency: "direct main"
     description:
       name: firebase_core
       url: "https://pub.dartlang.org"
