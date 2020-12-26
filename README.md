@@ -25,7 +25,7 @@
 ## Add, Edit
 ![alt](readmeimg/AddEdit.png)
 ![alt](readmeimg/PickDate.png)
-![alt](readmeimg/PickTime.png.png)
+![alt](readmeimg/PickTime.png)
 
 ## Delete
 ![alt](readmeimg/Delete1.png)
