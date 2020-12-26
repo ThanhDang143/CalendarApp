@@ -1,16 +1,35 @@
-# calendar_app
+# Calendar App
 
-A new Flutter project.
+A Calendar App made with flutter
+Save data on Cloud Firestore and Auth with Firebase Auth
+User can:
+- SignIn, SignUp, SignOut
+- View calendar table
+- View, Add, Edit, Delete events
+- Set notification to events
+# Getting Started
 
-## Getting Started
+## SignIn, SignUp, SignOut
+### SignIn
+![alt](readmeimg/SignIn.png)
+### SignUp
+![alt](readmeimg/SignUp.png)
+### Drawer and SignOut
+![alt](readmeimg/Drawer.png)
 
-This project is a starting point for a Flutter application.
+## Home, All Events
+### HomePage
+![alt](readmeimg/Home.png)
+### All
+![alt](readmeimg/All.png)
+## Add, Edit
+![alt](readmeimg/AddEdit.png)
+![alt](readmeimg/PickDate.png)
+![alt](readmeimg/PickTime.png.png)
 
-A few resources to get you started if this is your first Flutter project:
+## Delete
+![alt](readmeimg/Delete1.png)
+![alt](readmeimg/Delete2.png)
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Notification
+![alt](readmeimg/Noti.png)
