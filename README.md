@@ -1,8 +1,8 @@
 # Calendar App
 
-A Calendar App made with flutter
-Save data on Cloud Firestore and Auth with Firebase Auth
-User can:
+##### A Calendar App made with flutter
+##### Save data on Cloud Firestore and Auth with Firebase Auth
+##### User can:
 - SignIn, SignUp, SignOut
 - View calendar table
 - View, Add, Edit, Delete events
